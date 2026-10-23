@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Крестики‑нолики — китайский стиль</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Sans+SC:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css?v=4" />
+  </head>
+  <body>
+    <div class="bg" aria-hidden="true">
+      <!-- общие градиенты для стеблей бамбука -->
+      <svg class="bamboo__defs" width="0" height="0" focusable="false">
+        <defs>
+          <linearGradient id="bbFar" x1="0" x2="1" y1="0" y2="0">
+            <stop offset="0" stop-color="#0b241b" />
+            <stop offset=".3" stop-color="#1d5a42" />
+            <stop offset=".55" stop-color="#2f7d5b" />
+            <stop offset=".8" stop-color="#17493a" />
+            <stop offset="1" stop-color="#081a14" />
+          </linearGradient>
+          <linearGradient id="bbMid" x1="0" x2="1" y1="0" y2="0">
+            <stop offset="0" stop-color="#08201a" />
+            <stop offset=".25" stop-color="#216648" />
+            <stop offset=".55" stop-color="#3d9366" />
+            <stop offset=".8" stop-color="#1f5c42" />
+            <stop offset="1" stop-color="#07170f" />
+          </linearGradient>
+          <linearGradient id="bbNear" x1="0" x2="1" y1="0" y2="0">
+            <stop offset="0" stop-color="#07170f" />
+            <stop offset=".22" stop-color="#1b5a3c" />
+            <stop offset=".5" stop-color="#3fa46f" />
+            <stop offset=".74" stop-color="#2a7a52" />
+            <stop offset=".92" stop-color="#143d2a" />
+            <stop offset="1" stop-color="#d9772a" stop-opacity=".55" />
+          </linearGradient>
+        </defs>
+      </svg>
+
+      <div class="bamboo" id="bamboo">
+        <div class="bamboo__layer bamboo__layer--far"></div>
+        <div class="mist mist--a"></div>
+        <div class="bamboo__layer bamboo__layer--mid"></div>
+        <div class="mist mist--b"></div>
+        <div class="bamboo__layer bamboo__layer--near"></div>
+      </div>
+      <div id="fallLeaves"></div>
+      <div id="sparks"></div>
+
+      <div class="bg__noise"></div>
+      <div class="lantern lantern--a"></div>
+      <div class="lantern lantern--b"></div>
+      <div class="lantern lantern--c"></div>
+    </div>
+
+    <main class="app" id="app">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand__mark" aria-hidden="true">囍</div>
+          <div class="brand__text">
+            <div class="brand__title">Крестики‑нолики</div>
+            <div class="brand__subtitle">играй • медитируй • побеждай</div>
+          </div>
+        </div>
+        <div class="hint" id="hint" role="status" aria-live="polite"></div>
+      </header>
+
+      <section class="card setup" id="setup">
+        <h2 class="card__title">Перед началом</h2>
+        <p class="card__desc">
+          Введи имена игроков. Победа в раунде даёт 1 очко. Первый до <b>5</b> побед — чемпион.
+        </p>
+
+        <form class="form" id="setupForm">
+          <label class="field">
+            <span class="field__label">Игрок 1 (X)</span>
+            <input class="field__input" name="p1" maxlength="16" placeholder="Напр. Ли" required />
+          </label>
+
+          <label class="field">
+            <span class="field__label">Игрок 2 (O)</span>
+            <input class="field__input" name="p2" maxlength="16" placeholder="Напр. Мэй" required />
+          </label>
+
+          <div class="form__row">
+            <button class="btn btn--primary" type="submit">
+              <span class="btn__shine" aria-hidden="true"></span>
+              Начать игру
+            </button>
+            <button class="btn btn--ghost" id="demoBtn" type="button">Автозаполнить</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="game" id="game" hidden>
+        <div class="hud">
+          <div class="player player--x" id="playerX">
+            <div class="player__head">
+              <div class="badge badge--x">X</div>
+              <div class="player__meta">
+                <div class="player__name" id="nameX">Игрок X</div>
+                <div class="player__score">
+                  Победы: <b id="scoreX">0</b> / 5
+                  <span class="dot" aria-hidden="true"></span>
+                  Раунд: <b id="roundNo">1</b>
+                </div>
+              </div>
+            </div>
+            <div class="progress" aria-label="Прогресс игрока X">
+              <div class="progress__bar" id="barX"></div>
+              <div class="progress__glow" aria-hidden="true"></div>
+            </div>
+          </div>
+
+          <div class="center">
+            <div class="seal" aria-hidden="true">福</div>
+            <div class="turn" id="turnText">Ход: X</div>
+            <div class="controls">
+              <button class="btn btn--small" id="undoBtn" type="button">Отменить ход</button>
+              <button class="btn btn--small btn--accent" id="nextRoundBtn" type="button" disabled>
+                Новый раунд
+              </button>
+              <button class="btn btn--small btn--danger" id="restartBtn" type="button">Перезапуск</button>
+            </div>
+          </div>
+
+          <div class="player player--o" id="playerO">
+            <div class="player__head">
+              <div class="badge badge--o">O</div>
+              <div class="player__meta">
+                <div class="player__name" id="nameO">Игрок O</div>
+                <div class="player__score">Победы: <b id="scoreO">0</b> / 5</div>
+              </div>
+            </div>
+            <div class="progress" aria-label="Прогресс игрока O">
+              <div class="progress__bar" id="barO"></div>
+              <div class="progress__glow" aria-hidden="true"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="boardWrap">
+          <div class="board" id="board" role="grid" aria-label="Игровое поле 3 на 3">
+            <button class="cell" data-i="0" type="button" role="gridcell" aria-label="Клетка 1"></button>
+            <button class="cell" data-i="1" type="button" role="gridcell" aria-label="Клетка 2"></button>
+            <button class="cell" data-i="2" type="button" role="gridcell" aria-label="Клетка 3"></button>
+            <button class="cell" data-i="3" type="button" role="gridcell" aria-label="Клетка 4"></button>
+            <button class="cell" data-i="4" type="button" role="gridcell" aria-label="Клетка 5"></button>
+            <button class="cell" data-i="5" type="button" role="gridcell" aria-label="Клетка 6"></button>
+            <button class="cell" data-i="6" type="button" role="gridcell" aria-label="Клетка 7"></button>
+            <button class="cell" data-i="7" type="button" role="gridcell" aria-label="Клетка 8"></button>
+            <button class="cell" data-i="8" type="button" role="gridcell" aria-label="Клетка 9"></button>
+            <div class="winLine" id="winLine" aria-hidden="true"></div>
+          </div>
+
+          <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <span class="footer__tip"></span>
+      </footer>
+    </main>
+
+    <script src="./main.js?v=4"></script>
+  </body>
+</html>
